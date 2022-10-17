@@ -124,4 +124,4 @@ STATIC_URL = '/static/'
 
 
 # Telegram Bot - Settings
-BOT_TOKEN = '5729171120:AAEmqLp9M8-x6Z_GHoLXbIlwH4NnW8lNS6o'
+BOT_TOKEN = os.getenv("TOKEN")

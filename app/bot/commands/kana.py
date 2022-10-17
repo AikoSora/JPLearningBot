@@ -1,14 +1,16 @@
 import datetime
 import time
-
 from decimal import Decimal
-from aiogram.types import ReplyKeyboardMarkup as RKM, KeyboardButton as KB
-from aiogram.types import InlineKeyboardMarkup as IKM, InlineKeyboardButton as IKB
+from json import dumps, loads
+from random import choice, randint
+
+from aiogram.types import InlineKeyboardButton as IKB
+from aiogram.types import InlineKeyboardMarkup as IKM
+from aiogram.types import KeyboardButton as KB
+from aiogram.types import ReplyKeyboardMarkup as RKM
+
 from app.bot import handler
 from app.models import Account
-from random import randint, choice
-from json import loads, dumps
-
 
 inline_keyboard = IKM(inline_keyboard=[
     [IKB("Хирагана", callback_data="hiragana_test"), IKB("Катакана", callback_data="katakana_test")]
@@ -139,10 +141,10 @@ async def kana_test(message, path_args, bot, user):
     if user.kana_test_count == 10:
         average_time = get_user_average_time(user)
 
-        if not user.kana_average_time or user.kana_average_time > average_time:
-            user.kana_average_time = average_time
+        if (not user.kana_average_time or user.kana_average_time > average_time) and \
+                (user.kana_rating_right < user.kana_test_right):
 
-        if user.kana_rating_right < user.kana_test_right:
+            user.kana_average_time = average_time
             user.kana_rating_right = user.kana_test_right
 
         user.kana_average_json_array = '{"data": []}'
@@ -176,7 +178,10 @@ async def _(callback, path_args, bot, user):
     data = get_symbol_from_kana(HIRAGANA)
 
     user.dialog = Account.Dialog.HIRAGANA
-    add_time_in_database_array(user, start=True)
+
+    if user.kana_test_count == 0:
+        add_time_in_database_array(user, start=True)
+
     user.kana_test_temp = data[1]
     user.save()
 
@@ -189,7 +194,10 @@ async def _(callback, path_args, bot, user):
     data = get_symbol_from_kana(KATAKANA)
 
     user.dialog = Account.Dialog.KATAKANA
-    add_time_in_database_array(user, start=True)
+
+    if user.kana_test_count == 0:
+        add_time_in_database_array(user, start=True)
+
     user.kana_test_temp = data[1]
     user.save()
 

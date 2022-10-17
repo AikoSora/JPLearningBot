@@ -1,14 +1,16 @@
-import time
 import datetime
-
-from aiogram.types import ReplyKeyboardMarkup as RKM, KeyboardButton as KB
-from aiogram.types import InlineKeyboardMarkup as IKM, InlineKeyboardButton as IKB
-from app.bot import handler
-from app.models import Account
-from random import randint
+import time
 from decimal import Decimal
 from json import dumps, loads
+from random import randint
 
+from aiogram.types import InlineKeyboardButton as IKB
+from aiogram.types import InlineKeyboardMarkup as IKM
+from aiogram.types import KeyboardButton as KB
+from aiogram.types import ReplyKeyboardMarkup as RKM
+
+from app.bot import handler
+from app.models import Account
 
 numbers = ["ぜろ", "いち", "に", "さん", "よん", "ご", "ろく", "なな", "はち", "きゅう"]
 all = {10: "じゅう", 100: "ひゃく", 1000: "せん", 10000: "まん"}
@@ -138,7 +140,10 @@ async def _(callback, path_args, bot, user):
     data = get_random_number_and_text()
     user.dialog = Account.Dialog.NUMBERS
     user.numbers_test_temp = data[1]
-    add_time_in_database_array(user, True)
+
+    if user.numbers_test_count == 0:
+        add_time_in_database_array(user, True)
+
     user.save()
 
     await callback.message.delete()
@@ -167,10 +172,9 @@ async def _(message, path_args, bot, user):
     if user.numbers_test_count == 10:
         average_time = get_user_average_time(user)
 
-        if not user.numbers_average_time or user.numbers_average_time > average_time:
+        if (not user.numbers_average_time or user.numbers_average_time > average_time) and \
+                (user.numbers_rating_right < user.numbers_test_right):
             user.numbers_average_time = average_time
-
-        if user.numbers_rating_right < user.numbers_test_right:
             user.numbers_rating_right = user.numbers_test_right
 
         user.numbers_average_json_array = '{"data": []}'
