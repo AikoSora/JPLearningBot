@@ -1,8 +1,9 @@
-from aiogram.types import InlineKeyboardMarkup as IKM, InlineKeyboardButton as IKB
+from aiogram.types import InlineKeyboardButton as IKB
+from aiogram.types import InlineKeyboardMarkup as IKM
 from aiogram.types.callback_query import CallbackQuery
+
 from app.bot import handler
 from app.models import Account
-
 
 profile_inline_keyboard = IKM(inline_keyboard=[
     [IKB("Магазин", callback_data="shop")]
